@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hospital Validation Server</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
@@ -20,7 +21,7 @@
                 </div>
                 <nav class="space-y-1">
                     <a href="#" class="flex items-center space-x-3 py-2.5 px-4 bg-slate-900 text-teal-400 rounded-lg font-medium transition">
-                        <span>Database RS (CRUD)</span>
+                        <i class="fa-solid fa-database mr-1"></i> <span>Database RS (CRUD)</span>
                     </a>
                 </nav>
             </div>
@@ -41,7 +42,7 @@
             <main class="p-8 space-y-8">
                 @if(session('success'))
                     <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm flex items-center shadow-xs">
-                        <span class="mr-2 font-bold">✓</span> {{ session('success') }}
+                        <i class="fa-solid fa-circle-check mr-2 text-emerald-600"></i> {{ session('success') }}
                     </div>
                 @endif
 
@@ -54,23 +55,23 @@
                         <form action="{{ route('hospital.store') }}" method="POST" class="space-y-4">
                             @csrf
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">KODE RS (Harus Unik)</label>
-                                <input type="text" name="kode_rs" required placeholder="Contoh: RSJKT01" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition text-sm bg-slate-50/50">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">KODE RUMAH SAKIT</label>
+                                <input type="text" name="kode_rs" required placeholder="Contoh: RS-PMI" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition text-sm bg-slate-50/50">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">NAMA RUMAH SAKIT</label>
-                                <input type="text" name="nama_rs" required placeholder="RS Jantung Sehat" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition text-sm bg-slate-50/50">
+                                <input type="text" name="nama_rs" required placeholder="Contoh: RS PMI BOGOR" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition text-sm bg-slate-50/50">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">STATUS VALIDASI</label>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">STATUS VALIDASI INTERNAL</label>
                                 <select name="status_rs" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition text-sm bg-white">
                                     <option value="Aktif">Aktif (Bisa Diakses External)</option>
                                     <option value="Non-Aktif">Non-Aktif (Blokir Akses)</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">ALAMAT LENGKAP</label>
-                                <textarea name="alamat_rs" rows="3" required placeholder="Alamat operasional resmi..." class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition text-sm bg-slate-50/50"></textarea>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">ALAMAT OPERASIONAL RESMI</label>
+                                <textarea name="alamat_rs" rows="3" required placeholder="Alamat lengkap rumah sakit..." class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition text-sm bg-slate-50/50"></textarea>
                             </div>
                             <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 rounded-xl transition text-sm cursor-pointer shadow-xs">
                                 Daftarkan Rumah Sakit
@@ -101,26 +102,27 @@
                                             <div class="text-xs text-slate-400 max-w-xs truncate">{{ $rs->alamat_rs }}</div>
                                         </td>
                                         <td class="py-4 px-6">
-                                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $rs->status_rs == 'Aktif' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
+                                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $rs->status_rs == 'Aktif' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
                                                 {{ $rs->status_rs }}
                                             </span>
                                         </td>
                                         <td class="py-4 px-6 text-right space-x-2">
                                             <button onclick="openEditModal({{ json_encode($rs) }})" class="text-xs font-medium text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-2.5 py-1.5 rounded-lg transition cursor-pointer">
-                                                Edit
+                                                <i class="fa-solid fa-pen-to-square"></i> Edit
                                             </button>
                                             
                                             <form action="{{ route('hospital.destroy', $rs->id) }}" method="POST" class="inline">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" onclick="return confirm('Hapus RS ini? Otomatis server external tidak bisa memvalidasi kode ini lagi.')" class="text-xs font-medium text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-lg transition cursor-pointer">
-                                                    Hapus
+                                                @csrf 
+                                                @method('DELETE')
+                                                <button type="submit" onclick="return confirm('Hapus RS ini? Otomatis server eksternal tidak bisa memvalidasi kode ini lagi.')" class="text-xs font-medium text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-lg transition cursor-pointer">
+                                                    <i class="fa-solid fa-trash"></i> Hapus
                                                 </button>
                                             </form>
                                         </td>
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="4" class="py-12 text-center text-slate-400 text-sm">Belum ada rumah sakit terdaftar di server ini.</td>
+                                        <td colspan="4" class="py-12 text-center text-slate-400 text-sm">Belum ada rumah sakit terdaftar di server validasi ini.</td>
                                     </tr>
                                     @endforelse
                                 </tbody>
@@ -136,16 +138,17 @@
     </div>
 
     <div id="editModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h3 class="text-base font-bold text-slate-900">Perbarui Data RS</h3>
                 <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 text-lg cursor-pointer">&times;</button>
             </div>
             
             <form id="editForm" method="POST" class="space-y-4">
-                @csrf @method('PUT')
+                @csrf 
+                @method('PUT')
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">KODE RS</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">KODE RUMAH SAKIT</label>
                     <input type="text" id="edit_kode" name="kode_rs" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-sm">
                 </div>
                 <div>
@@ -176,16 +179,16 @@
             const modal = document.getElementById('editModal');
             const form = document.getElementById('editForm');
             
-            // Set dynamic action URL Laravel
-            form.action = `/hospital/${hospital.id}`;
+            // Set Dynamic Action URL untuk update Laravel
+            form.action = '/hospital/' + hospital.id;
             
-            // Fill values
+            // Mengisi nilai input modal secara dinamis
             document.getElementById('edit_kode').value = hospital.kode_rs;
             document.getElementById('edit_nama').value = hospital.nama_rs;
             document.getElementById('edit_status').value = hospital.status_rs;
             document.getElementById('edit_alamat').value = hospital.alamat_rs;
             
-            // Show Modal
+            // Munculkan Modal
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }

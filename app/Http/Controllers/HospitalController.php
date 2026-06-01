@@ -1,23 +1,22 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Hospital;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class HospitalController extends Controller
 {
     // ==========================================
-    // [WEB] PANEL MANAGEMENT (CRUD)
+    // [WEB] PANEL MANAGEMENT (CRUD) - Tetap Aman
     // ==========================================
-
-    // List & Halaman Utama
     public function index()
     {
         $hospitals = Hospital::latest()->paginate(10);
         return view('dashboard', compact('hospitals'));
     }
 
-    // CREATE: Simpan RS Baru
     public function store(Request $request)
     {
         $request->validate([
@@ -28,11 +27,9 @@ class HospitalController extends Controller
         ]);
 
         Hospital::create($request->all());
-
         return redirect()->back()->with('success', 'Rumah Sakit berhasil ditambahkan!');
     }
 
-    // UPDATE: Update Data RS
     public function update(Request $request, $id)
     {
         $hospital = Hospital::findOrFail($id);
@@ -45,55 +42,59 @@ class HospitalController extends Controller
         ]);
 
         $hospital->update($request->all());
-
         return redirect()->back()->with('success', 'Data Rumah Sakit berhasil diperbarui!');
     }
 
-    // DELETE: Hapus RS dari sistem
     public function destroy($id)
     {
         $hospital = Hospital::findOrFail($id);
         $hospital->delete();
-
-        return redirect()->back()->with('success', 'Rumah Sakit berhasil dihapus dari sistem validation!');
+        return redirect()->back()->with('success', 'Rumah Sakit berhasil dihapus!');
     }
 
     // ==========================================
-    // [API] ENDPOINT UNTUK SERVER EKSTERNAL
+    // [API] ENDPOINT UNTUK SERVER UTAMA (REVISI)
     // ==========================================
     public function validateApi(Request $request)
     {
-        // Server lain wajib mengirimkan kode_rs
-        $request->validate([
+        // Menggunakan Validator manual agar response error formatnya rapi (JSON)
+        $validator = Validator::make($request->all(), [
             'kode_rs' => 'required|string'
         ]);
 
-        // Cari RS berdasarkan kode_rs dan pastikan statusnya "Aktif"
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Format request tidak valid, kode_rs wajib diisi.',
+                'errors'  => $validator->errors()
+            ], 400);
+        }
+
+        // Cari RS berdasarkan kode_rs
         $hospital = Hospital::where('kode_rs', $request->kode_rs)->first();
 
         if (!$hospital) {
             return response()->json([
-                'isValid' => false,
+                'status'  => 'not_found',
                 'message' => 'Kode RS tidak terdaftar di server validasi pusat.'
             ], 404);
         }
 
         if ($hospital->status_rs !== 'Aktif') {
             return response()->json([
-                'isValid' => false,
+                'status'  => 'inactive',
                 'message' => 'Kode RS terdaftar, tetapi status RS sedang Non-Aktif.'
             ], 403);
         }
 
-        // Jika ada dan aktif, kirim balikan data lengkapnya
+        // Response distandarkan, mengembalikan data snake_case sesuai DB asli
         return response()->json([
-            'isValid'  => true,
-            'message'  => 'Validasi berhasil. Data ditemukan.',
+            'status'   => 'success',
+            'message'  => 'Validasi berhasil. Rumah sakit aktif.',
             'resource' => [
-                'kode_rs'  => $hospital->kode_rs,
-                'namaRs'   => $hospital->nama_rs,
-                'alamatRs' => $hospital->alamat_rs,
-                'statusRs' => $hospital->status_rs,
+                'kode_rs'     => $hospital->kode_rs,
+                'nama_rs'     => $hospital->nama_rs,
+                'alamat_rs'   => $hospital->alamat_rs,
                 'verified_at' => now()->toIso8601String()
             ]
         ], 200);
